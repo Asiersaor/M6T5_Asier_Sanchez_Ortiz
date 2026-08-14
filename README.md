@@ -357,3 +357,94 @@ La Fase 3 queda implementada con una interfaz clara, funcional y con validación
 ## Resumen final del proyecto
 
 El proyecto mantiene el historial completo de las fases anteriores y añade la Fase 3 sin alterar la documentación previa. La aplicación evoluciona de una base mínima a una herramienta más útil y práctica, siempre respetando los límites de cada etapa de desarrollo.
+
+---
+
+## Fase 4: Refactorización y optimización
+
+### Descripción general
+
+La aplicación de escritorio sigue manteniendo el historial completo de las fases anteriores y se centra en esta fase en la mejora del código y de la experiencia visual. La intención no es añadir nuevas funcionalidades, sino revisar nombres, limpiar la estructura y optimizar la parte gráfica para que el programa sea más claro, más legible y más intuitivo para un usuario.
+
+### Objetivo de la fase
+
+La aplicación debe cumplir con los siguientes puntos:
+
+- Revisar nombres de variables y funciones para que sean más intuitivos.
+- Mejorar la organización interna del código sin romper ninguna funcionalidad existente.
+- Optimizar la apariencia visual para que la interfaz sea más limpia y profesional.
+- Mantener la estructura modular y el historial completo del proyecto.
+- Documentar los cambios en el README sin eliminar las fases anteriores.
+
+### Qué se ha revisado y mejorado
+
+#### 1. Nombres más intuitivos
+
+Se han revisado los nombres de funciones y variables para que describan mejor su propósito. Por ejemplo, nombres más claros para acciones como generar, guardar, copiar e indicar complejidad hacen que el código sea más fácil de entender.
+
+#### 2. Estructura más ordenada
+
+Se ha reorganizado la lógica dentro de `main.py` para diferenciar mejor:
+
+- creación de la ventana,
+- configuración visual,
+- generación de la contraseña,
+- copia al portapapeles,
+- guardado en archivo,
+- actualización del indicador de complejidad.
+
+#### 3. Optimización visual
+
+Se ha mejorado la apariencia general de la interfaz para que sea más clara y agradable, manteniendo la funcionalidad que ya existía. La disposición de los elementos se ha ordenado para que resulte más natural a la vista.
+
+### Flujo de trabajo de la fase 4
+
+1. Se revisan los nombres existentes para detectar elementos poco claros.
+2. Se refactoriza la estructura interna y la organización visual.
+3. Se mantiene intacta la lógica de las fases anteriores.
+4. Se valida que la aplicación sigue funcionando correctamente.
+5. Se documenta el cambio en este README.
+
+### Código principal
+
+#### `main.py`
+
+- `crear_ventana_principal()`: prepara la ventana principal.
+- `crear_interfaz_principal()`: organiza la interfaz de forma más limpia.
+- `generar_y_mostrar_contrasena()`: genera y muestra la contraseña en el campo principal.
+- `copiar_contrasena_al_portapapeles()`: copia la contraseña al portapapeles.
+- `guardar_contrasena_actual()`: guarda la contraseña con fecha y hora.
+- `actualizar_indicador_complejidad()`: actualiza el nivel de seguridad visual.
+
+#### `utils/generador.py`
+
+- `evaluar_complejidad()`: mantiene la lógica de valoración de la contraseña.
+- `generar_contrasena()`: sigue generando la contraseña según los tipos seleccionados.
+
+### Restricciones de la fase 4
+
+Esta fase incluye únicamente:
+
+- refactorización de nombres
+- mejora de la organización y la interfaz visual
+- optimización estructural sin cambiar la lógica funcional del proyecto
+
+No se implementan funcionalidades de fases posteriores, ni se añaden cambios que alteren el comportamiento ya validado de la aplicación.
+
+### Cómo ejecutar la aplicación
+
+Desde la carpeta del proyecto:
+
+```bash
+python main.py
+```
+
+### Estado actual de la Fase 4
+
+La Fase 4 queda implementada como una mejora de calidad de la aplicación: nombres más claros, estructura más ordenada y una interfaz más limpia, sin romper ninguna funcionalidad existente.
+
+---
+
+## Resumen final del proyecto
+
+El proyecto conserva todo el historial de las fases anteriores, y la Fase 4 aporta una mejora orientada a la claridad, la mantenibilidad y la experiencia visual. La aplicación sigue funcionando de forma consistente y autónoma, respetando el alcance de cada etapa de desarrollo.
