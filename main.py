@@ -3,7 +3,14 @@ from datetime import datetime
 from pathlib import Path
 from tkinter import messagebox
 
-from utils.generador import LONGITUD_CONTRASENA, evaluar_complejidad, generar_contrasena
+from utils.generador import (
+    LONGITUD_CONTRASENA,
+    LOTE_MINIMO,
+    LOTE_MAXIMO,
+    evaluar_complejidad,
+    generar_contrasena,
+    generar_lote_contrasenas,
+)
 
 RUTA_GUARDADO = Path(__file__).resolve().parent / "passwords_guardadas"
 
@@ -35,12 +42,35 @@ def guardar_contrasena_archivo(contrasena: str) -> str:
     return guardar_contrasena_en_archivo(contrasena)
 
 
+def guardar_lote_contrasenas_en_archivo(lista_contrasenas: list[str]) -> str:
+    """Fase 5: Guarda un lote de contraseñas en un archivo con fecha y hora."""
+    if not lista_contrasenas:
+        raise ValueError("No hay ningún lote de contraseñas para guardar.")
+
+    RUTA_GUARDADO.mkdir(exist_ok=True)
+
+    fecha_hora_actual = datetime.now()
+    nombre_archivo = f"lote_{fecha_hora_actual.strftime('%Y-%m-%d_%H-%M-%S')}.txt"
+    ruta_archivo = RUTA_GUARDADO / nombre_archivo
+
+    with ruta_archivo.open("w", encoding="utf-8") as archivo:
+        archivo.write(f"Lote de contraseñas generado: {len(lista_contrasenas)} contraseñas\n")
+        archivo.write(
+            f"Fecha y hora de guardado: {fecha_hora_actual.strftime('%d/%m/%Y %H:%M:%S')}\n"
+        )
+        archivo.write("=" * 50 + "\n")
+        for i, contrasena in enumerate(lista_contrasenas, 1):
+            archivo.write(f"{i}. {contrasena}\n")
+
+    return str(ruta_archivo)
+
+
 def crear_ventana_principal() -> tk.Tk:
     """Crea la ventana principal de la aplicación."""
     ventana = tk.Tk()
     ventana.title("Generador de contraseñas")
-    ventana.geometry("620x420")
-    ventana.minsize(520, 360)
+    ventana.geometry("720x650")
+    ventana.minsize(600, 550)
     ventana.configure(bg="#f2f5fb")
     ventana.resizable(True, True)
     return ventana
@@ -128,6 +158,155 @@ def crear_interfaz_principal(ventana: tk.Tk) -> None:
     )
     campo_contrasena.pack(fill="x", padx=8)
 
+    # Fase 5: Panel de generación en lote con Spinbox (5-10 contraseñas).
+    panel_lotes = tk.Frame(contenedor_principal, bg="#f0f0f0", bd=1, relief="solid")
+    panel_lotes.pack(fill="x", pady=(10, 0), padx=4)
+
+    frame_lotes = tk.Frame(panel_lotes, bg="#f0f0f0", padx=12, pady=10)
+    frame_lotes.pack(fill="x")
+
+    tk.Label(frame_lotes, text="Generar lote:", font=("Arial", 10, "bold"), bg="#f0f0f0").pack(
+        side="left"
+    )
+
+    spinbox_cantidad_lote = tk.Spinbox(
+        frame_lotes,
+        from_=LOTE_MINIMO,
+        to=LOTE_MAXIMO,
+        width=6,
+        justify="center",
+        font=("Arial", 10),
+    )
+    spinbox_cantidad_lote.delete(0, tk.END)
+    spinbox_cantidad_lote.insert(0, str(LOTE_MINIMO))
+    spinbox_cantidad_lote.pack(side="left", padx=(10, 0))
+
+    tk.Label(frame_lotes, text=f"contraseñas (mín: {LOTE_MINIMO}, máx: {LOTE_MAXIMO})", 
+             font=("Arial", 9), bg="#f0f0f0").pack(side="left", padx=(8, 0))
+
+    # Fase 5: Panel de resumen de criterios aplicados.
+    panel_resumen = tk.Frame(contenedor_principal, bg="#e8f4f8", bd=1, relief="solid")
+    panel_resumen.pack(fill="x", pady=(8, 0), padx=4)
+
+    frame_resumen = tk.Frame(panel_resumen, bg="#e8f4f8", padx=12, pady=8)
+    frame_resumen.pack(fill="x")
+
+    etiqueta_resumen = tk.Label(
+        frame_resumen,
+        text="Criterios: Longitud | Tipos | Complejidad | Sin ambiguos",
+        font=("Arial", 9, "italic"),
+        bg="#e8f4f8",
+        fg="#2c5282",
+    )
+    etiqueta_resumen.pack(anchor="w")
+
+    def actualizar_resumen_criterios() -> None:
+        """Actualiza el panel de resumen de criterios aplicados."""
+        try:
+            longitud = int(spinbox_longitud.get())
+            tipos_activos = [t for t, v in variables_tipos.items() if v.get()]
+            texto_tipos = ", ".join([t.capitalize() for t in tipos_activos]) or "Ninguno"
+            resumen = f"Criterios: Longitud {longitud} | Tipos: {texto_tipos} | Complejidad | Sin caracteres ambiguos"
+            etiqueta_resumen.config(text=resumen)
+        except Exception:
+            pass
+
+    def generar_lote_contrasenas_interfaz() -> None:
+        """Genera un lote de contraseñas según la configuración."""
+        try:
+            cantidad = int(spinbox_cantidad_lote.get())
+            longitud = int(spinbox_longitud.get())
+            tipos_seleccionados = {
+                nombre: variable.get() for nombre, variable in variables_tipos.items()
+            }
+            lote = generar_lote_contrasenas(cantidad, longitud, tipos_seleccionados)
+            
+            # Mostrar el lote en una ventana emergente
+            ventana_lote = tk.Toplevel(ventana)
+            ventana_lote.title(f"Lote de {cantidad} contraseñas")
+            ventana_lote.geometry("500x400")
+
+            frame_lote_content = tk.Frame(ventana_lote, bg="#f2f5fb", padx=12, pady=12)
+            frame_lote_content.pack(fill="both", expand=True)
+
+            tk.Label(
+                frame_lote_content, 
+                text=f"Lote de {cantidad} contraseñas generadas:",
+                font=("Arial", 11, "bold"),
+                bg="#f2f5fb"
+            ).pack(anchor="w", pady=(0, 8))
+
+            frame_scrollable = tk.Frame(frame_lote_content, bg="#ffffff", bd=1, relief="sunken")
+            frame_scrollable.pack(fill="both", expand=True, pady=(0, 10))
+
+            scrollbar = tk.Scrollbar(frame_scrollable)
+            scrollbar.pack(side="right", fill="y")
+
+            text_lote = tk.Text(
+                frame_scrollable,
+                height=15,
+                width=50,
+                font=("Courier", 10),
+                yscrollcommand=scrollbar.set,
+                state="normal"
+            )
+            text_lote.pack(side="left", fill="both", expand=True)
+            scrollbar.config(command=text_lote.yview)
+
+            for i, pwd in enumerate(lote, 1):
+                text_lote.insert(tk.END, f"{i}. {pwd}\n")
+            text_lote.config(state="disabled")
+
+            frame_botones_lote = tk.Frame(frame_lote_content, bg="#f2f5fb")
+            frame_botones_lote.pack(fill="x", pady=(10, 0))
+
+            def copiar_lote():
+                """Copia el lote completo al portapapeles."""
+                try:
+                    texto_completo = "\n".join([f"{i}. {pwd}" for i, pwd in enumerate(lote, 1)])
+                    ventana.clipboard_clear()
+                    ventana.clipboard_append(texto_completo)
+                    messagebox.showinfo("Lote copiado", f"Se copiaron {cantidad} contraseñas al portapapeles.")
+                except Exception as error:
+                    messagebox.showerror("Error", f"No se pudo copiar: {error}")
+
+            def guardar_lote():
+                """Guarda el lote en un archivo."""
+                try:
+                    ruta = guardar_lote_contrasenas_en_archivo(lote)
+                    messagebox.showinfo("Lote guardado", f"Guardado en:\n{ruta}")
+                except Exception as error:
+                    messagebox.showerror("Error", f"No se pudo guardar: {error}")
+
+            boton_copiar_lote = tk.Button(
+                frame_botones_lote,
+                text="Copiar lote",
+                command=copiar_lote,
+                width=20,
+                bg="#dbeafe",
+                fg="#1e3a8a",
+                font=("Arial", 9, "bold"),
+            )
+            boton_copiar_lote.pack(side="left", padx=(0, 8))
+
+            boton_guardar_lote = tk.Button(
+                frame_botones_lote,
+                text="Guardar lote",
+                command=guardar_lote,
+                width=20,
+                bg="#dcfce7",
+                fg="#166534",
+                font=("Arial", 9, "bold"),
+            )
+            boton_guardar_lote.pack(side="left")
+
+        except (TypeError, ValueError) as error:
+            messagebox.showerror("Configuración no válida", str(error))
+        except Exception as error:
+            messagebox.showerror("Error inesperado", f"No se pudo generar el lote: {error}")
+
+    campo_contrasena.pack(fill="x", padx=8)
+
     def actualizar_indicador_complejidad(contrasena: str) -> None:
         """Actualiza el texto visible y el color del indicador de complejidad."""
         nivel = evaluar_complejidad(contrasena)
@@ -159,6 +338,7 @@ def crear_interfaz_principal(ventana: tk.Tk) -> None:
         campo_contrasena.insert(0, contrasena)
         campo_contrasena.config(state="readonly")
         actualizar_indicador_complejidad(contrasena)
+        actualizar_resumen_criterios()
 
     def copiar_contrasena_al_portapapeles() -> None:
         """Copia la contraseña actual al portapapeles del sistema."""
@@ -190,44 +370,57 @@ def crear_interfaz_principal(ventana: tk.Tk) -> None:
         except Exception as error:
             messagebox.showerror("Error al guardar", f"No se pudo guardar la contraseña: {error}")
 
-    frame_botones = tk.Frame(contenedor_principal, bg="#f2f5fb", pady=10)
+    frame_botones = tk.Frame(contenedor_principal, bg="#f2f5fb", pady=12)
     frame_botones.pack()
 
     boton_generar = tk.Button(
         frame_botones,
         text="Generar contraseña",
         command=generar_y_mostrar_contrasena,
-        width=18,
+        width=15,
         height=2,
         bg="#2563eb",
         fg="white",
-        font=("Arial", 10, "bold"),
+        font=("Arial", 9, "bold"),
     )
-    boton_generar.pack(side="left", padx=8)
+    boton_generar.pack(side="left", padx=4)
 
     boton_copiar = tk.Button(
         frame_botones,
         text="Copiar",
         command=copiar_contrasena_al_portapapeles,
-        width=12,
+        width=10,
         height=2,
         bg="#dbeafe",
         fg="#1e3a8a",
-        font=("Arial", 10, "bold"),
+        font=("Arial", 9, "bold"),
     )
-    boton_copiar.pack(side="left", padx=8)
+    boton_copiar.pack(side="left", padx=4)
 
     boton_guardar = tk.Button(
         frame_botones,
         text="Guardar",
         command=guardar_contrasena_actual,
-        width=12,
+        width=10,
         height=2,
         bg="#dcfce7",
         fg="#166534",
-        font=("Arial", 10, "bold"),
+        font=("Arial", 9, "bold"),
     )
-    boton_guardar.pack(side="left", padx=8)
+    boton_guardar.pack(side="left", padx=4)
+
+    # Fase 5: Botón para generar lotes.
+    boton_generar_lote = tk.Button(
+        frame_botones,
+        text="Generar lote",
+        command=generar_lote_contrasenas_interfaz,
+        width=12,
+        height=2,
+        bg="#f59e0b",
+        fg="white",
+        font=("Arial", 9, "bold"),
+    )
+    boton_generar_lote.pack(side="left", padx=4)
 
     # Carga inicial para que la app ya muestre una contraseña al abrirse.
     generar_y_mostrar_contrasena()

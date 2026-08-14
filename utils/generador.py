@@ -6,6 +6,14 @@ LONGITUD_CONTRASENA = 12
 LONGITUD_MINIMA = 8
 LONGITUD_MAXIMA = 64
 
+# Fase 5: Rango de generación en lote (mínimo 5, máximo 10 contraseñas).
+LOTE_MINIMO = 5
+LOTE_MAXIMO = 10
+
+# Fase 5: Caracteres ambiguos que se evitan para mayor claridad.
+# Se evitan: 0/O (cero/letra O), 1/l/I (uno/ele/iy mayúscula), etc.
+CARACTERES_AMBIGUOS = "0OIl|`~"
+
 # Diccionario que agrupa los tipos de caracteres permitidos en la aplicación.
 # Cada clave representa un tipo y su valor es el conjunto de caracteres asociado.
 TIPOS_CARACTERES = {
@@ -60,14 +68,21 @@ def evaluar_complejidad(contrasena: str) -> str:
     return "Baja"
 
 
+def _filtrar_caracteres_ambiguos(caracteres: str) -> str:
+    """Elimina caracteres ambiguos del conjunto para mayor legibilidad de la contraseña."""
+    return "".join(c for c in caracteres if c not in CARACTERES_AMBIGUOS)
+
+
 def generar_contrasena(
     longitud: int = LONGITUD_CONTRASENA,
     tipos_seleccionados: dict[str, bool] | None = None,
+    evitar_ambiguos: bool = True,
 ) -> str:
     """Genera una contraseña segura usando los tipos seleccionados por el usuario.
 
     La contraseña siempre se crea con una longitud válida y con una selección
     no vacía. Si no se indica ningún conjunto, se usa la configuración completa.
+    El parámetro evitar_ambiguos, por defecto True, filtra caracteres confusos.
     """
     if tipos_seleccionados is None:
         tipos_seleccionados = {nombre: True for nombre in TIPOS_CARACTERES}
@@ -80,6 +95,10 @@ def generar_contrasena(
         if tipos_seleccionados.get(tipo, False)
     )
 
+    # Fase 5: Se filtran caracteres ambiguos si está activado.
+    if evitar_ambiguos:
+        caracteres_disponibles = _filtrar_caracteres_ambiguos(caracteres_disponibles)
+
     # Para asegurar que la contraseña incluya al menos un carácter de cada tipo
     # seleccionado, se añaden primero esos caracteres y luego se rellena el resto.
     tipos_activos = [
@@ -87,7 +106,11 @@ def generar_contrasena(
     ]
 
     password = [
-        secrets.choice(TIPOS_CARACTERES[tipo])
+        secrets.choice(
+            _filtrar_caracteres_ambiguos(TIPOS_CARACTERES[tipo])
+            if evitar_ambiguos
+            else TIPOS_CARACTERES[tipo]
+        )
         for tipo in tipos_activos
     ]
 
@@ -98,3 +121,29 @@ def generar_contrasena(
     # predecible y para evitar que siempre aparezcan primero los del mismo tipo.
     secrets.SystemRandom().shuffle(password)
     return "".join(password)[:longitud]
+
+
+def generar_lote_contrasenas(
+    cantidad: int,
+    longitud: int = LONGITUD_CONTRASENA,
+    tipos_seleccionados: dict[str, bool] | None = None,
+    evitar_ambiguos: bool = True,
+) -> list[str]:
+    """Genera un lote de contraseñas de forma masiva (entre 5 y 10).
+
+    La cantidad debe estar entre LOTE_MINIMO y LOTE_MAXIMO.
+    Devuelve una lista con las contraseñas generadas.
+    """
+    if not isinstance(cantidad, int):
+        raise ValueError("La cantidad debe ser un número entero.")
+
+    if cantidad < LOTE_MINIMO or cantidad > LOTE_MAXIMO:
+        raise ValueError(
+            f"La cantidad debe estar entre {LOTE_MINIMO} y {LOTE_MAXIMO} contraseñas."
+        )
+
+    return [
+        generar_contrasena(longitud, tipos_seleccionados, evitar_ambiguos)
+        for _ in range(cantidad)
+    ]
+

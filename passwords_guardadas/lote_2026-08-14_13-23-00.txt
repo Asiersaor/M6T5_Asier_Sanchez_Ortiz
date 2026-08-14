@@ -1,0 +1,8 @@
+Lote de contraseñas generado: 5 contraseñas
+Fecha y hora de guardado: 14/08/2026 13:23:00
+==================================================
+1. test1
+2. test2
+3. test3
+4. test4
+5. test5
