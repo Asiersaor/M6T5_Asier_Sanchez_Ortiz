@@ -229,3 +229,131 @@ La Fase 2 queda implementada con una base funcional y validada. La aplicación p
 ## Resumen final
 
 El proyecto mantiene la estructura modular de la Fase 1 y amplía la funcionalidad en la Fase 2 sin perder la documentación previa. Ambas fases quedan reflejadas en este README para mantener un historial claro del desarrollo y del flujo de trabajo del proyecto.
+
+---
+
+## Fase 3: Copia, complejidad y guardado
+
+### Descripción general
+
+La aplicación de escritorio continúa evolucionando en Python 3.14 con Tkinter y mantiene el historial completo de las fases anteriores. En esta fase se añaden funciones útiles para la gestión diaria de la contraseña generada: copiarla al portapapeles, evaluar su nivel de complejidad y guardarla en un archivo TXT con fecha y hora.
+
+### Objetivo de la fase
+
+La aplicación debe cumplir con las siguientes funciones:
+
+- Implementar un botón para copiar la contraseña generada al portapapeles.
+- Mostrar un indicador de complejidad para la contraseña generada.
+- Guardar la contraseña en un archivo `.txt` junto con la fecha y la hora exactas del guardado.
+- Gestionar errores con `messagebox` para informar al usuario de forma clara.
+- Mantener una interfaz limpia, intuitiva y funcional.
+
+### Stack tecnológico
+
+- Python 3.14
+- Tkinter
+- `datetime` para registrar la fecha y hora del guardado
+- `messagebox` para errores y avisos
+
+### Nuevas funcionalidades añadidas
+
+#### 1. Copia al portapapeles
+
+Se añade un botón llamado “Copiar” que toma el valor actual del campo de la contraseña y lo guarda en el portapapeles del sistema.
+
+#### 2. Indicador de complejidad
+
+La aplicación evalúa la contraseña generada en función de criterios como:
+
+- longitud
+- presencia de minúsculas
+- presencia de mayúsculas
+- presencia de números
+- presencia de símbolos
+
+El resultado se muestra como:
+
+- Baja
+- Media
+- Alta
+- Muy alta
+
+#### 3. Guardado en archivo TXT
+
+Se crea una carpeta llamada `passwords_guardadas` dentro del proyecto. Cada contraseña se guarda en un archivo con el formato:
+
+- `password_YYYY-MM-DD_HH-MM-SS.txt`
+
+El archivo incluye:
+
+- la contraseña generada
+- la fecha y hora del guardado
+
+#### 4. Gestión de errores
+
+Se usan `messagebox` para avisar al usuario en situaciones como:
+
+- no hay contraseña generada
+- error al copiar al portapapeles
+- error al guardar en archivo
+- configuración inválida
+
+### Flujo de trabajo de la fase 3
+
+1. El usuario ejecuta la aplicación.
+2. La interfaz carga la configuración de las fases anteriores.
+3. El usuario genera una contraseña.
+4. La aplicación muestra la contraseña y calcula su complejidad.
+5. El usuario puede copiar la contraseña al portapapeles.
+6. El usuario puede guardar la contraseña en un archivo TXT con fecha y hora.
+7. Si ocurre un error, se muestra un aviso con `messagebox`.
+
+### Código principal
+
+#### `main.py`
+
+- `guardar_contrasena_archivo()`: crea la carpeta y guarda la contraseña con timestamp.
+- `crear_ventana_principal()`: crea la ventana principal.Contenedor de la app.
+- `crear_interfaz()`: define la interfaz con longitud, tipos, complejidad, botón generar, copiar y guardar.
+- `copiar_al_portapapeles()`: copia la contraseña al sistema.
+- `guardar_en_archivo()`: guarda la contraseña con fecha y hora.
+- `main()`: arranca la aplicación.
+
+#### `utils/generador.py`
+
+- `evaluar_complejidad()`: calcula el nivel de complejidad de la contraseña.
+- `generar_contrasena()`: mantiene la lógica de generación según la configuración activa.
+
+### Restricciones de la fase 3
+
+Esta fase incluye únicamente:
+
+- copia al portapapeles
+- indicador de complejidad
+- guardado en `.txt` con fecha y hora
+- gestión de errores con `messagebox`
+
+No se implementan funcionalidades de fases posteriores, como:
+
+- historial de contraseñas
+- exportación en formato CSV
+- autenticación o bloqueo
+- ajustes avanzados del programa
+
+### Cómo ejecutar la aplicación
+
+Desde la carpeta del proyecto:
+
+```bash
+python main.py
+```
+
+### Estado actual de la Fase 3
+
+La Fase 3 queda implementada con una interfaz clara, funcional y con validación de errores. La aplicación permite generar, copiar, evaluar y guardar la contraseña siguiendo el alcance solicitado.
+
+---
+
+## Resumen final del proyecto
+
+El proyecto mantiene el historial completo de las fases anteriores y añade la Fase 3 sin alterar la documentación previa. La aplicación evoluciona de una base mínima a una herramienta más útil y práctica, siempre respetando los límites de cada etapa de desarrollo.

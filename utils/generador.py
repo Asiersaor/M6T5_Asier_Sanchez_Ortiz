@@ -30,6 +30,36 @@ def validar_configuracion(longitud: int, tipos_seleccionados: dict[str, bool]) -
         raise ValueError("Debes seleccionar al menos un tipo de caracteres.")
 
 
+def evaluar_complejidad(contrasena: str) -> str:
+    """Devuelve el nivel de complejidad de la contraseña generada."""
+    if not contrasena:
+        return "Baja"
+
+    # Se suma un punto por cada criterio cumplido para valorar la fortaleza.
+    puntuacion = 0
+
+    if len(contrasena) >= 12:
+        puntuacion += 1
+    if len(contrasena) >= 16:
+        puntuacion += 1
+    if any(caracter.islower() for caracter in contrasena):
+        puntuacion += 1
+    if any(caracter.isupper() for caracter in contrasena):
+        puntuacion += 1
+    if any(caracter.isdigit() for caracter in contrasena):
+        puntuacion += 1
+    if any(not caracter.isalnum() for caracter in contrasena):
+        puntuacion += 1
+
+    if puntuacion >= 5:
+        return "Muy alta"
+    if puntuacion >= 4:
+        return "Alta"
+    if puntuacion >= 2:
+        return "Media"
+    return "Baja"
+
+
 def generar_contrasena(
     longitud: int = LONGITUD_CONTRASENA,
     tipos_seleccionados: dict[str, bool] | None = None,
